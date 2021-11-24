@@ -65,3 +65,5 @@ In order to access Kubeflow you will need to use SSH port forwarding and istio-i
 	sudo kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
 
 Then load up your local browser to http://localhost:8080
+
+Login with the default user's credential. The default email address is ``user@example.com`` and the default password is ``12341234``.
