@@ -62,5 +62,7 @@ module "bastion" {
   is_flex_shape = contains(["VM.Standard.E3.Flex", "VM.Standard.E4.Flex", "VM.Optimized3.Flex", "VM.Standard.A1.Flex"], var.bastion_shape)
   kubeflow_login_ocid = var.kubeflow_login_ocid
   kubeflow_password_ocid = var.kubeflow_password_ocid
+  kubeflow_login = var.kubeflow_login
+  kubeflow_password = var.kubeflow_password
 }
 

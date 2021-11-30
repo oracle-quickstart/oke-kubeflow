@@ -17,3 +17,5 @@ variable "bastion_flex_ocpus" {}
 variable "is_flex_shape" {}
 variable "kubeflow_login_ocid" {}
 variable "kubeflow_password_ocid" {}
+variable "kubeflow_login" {}
+variable "kubeflow_password" {}

@@ -170,6 +170,13 @@ variable "kubeflow_password_ocid" {
   default = "ocid1.vaultsecret.oc1.iad.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
 }
 
+variable "kubeflow_login" {
+  default = "user@example.com"
+}
+
+variable "kubeflow_password" {
+  default = "Kubeflow54321"
+}
 # ---------------------------------------------------------------------------------------------------------------------
 # Environmental variables
 # You probably want to define these as environmental variables.

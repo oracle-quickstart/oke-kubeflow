@@ -39,7 +39,8 @@ groupings:
   variables:
   - kubeflow_login_ocid
   - kubeflow_password_ocid
-  visible: false
+  - kubeflow_login
+  - kubeflow_password
 - title: "Bastion Configuration"
   variables:
   - public_edge_node
@@ -345,10 +346,26 @@ variables:
     description: "OCI Vault Secret OCID for Kubeflow Login ID"
     default: "ocid1.vaultsecret.oc1.iad.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     required: true
+    visible: false
 
   kubeflow_password_ocid:
     type: string
     title: "Kubeflow Password Vault Secret ID"
     description: "OCI Vault Secret OCID for Kubeflow Password"
     default: "ocid1.vaultsecret.oc1.iad.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    required: true
+    visible: false
+
+  kubeflow_login:
+    type: string
+    title: "Kubeflow Login"
+    description: "Set Login for Kubeflow e.g. your email address"
+    default: "user@example.com"
+    required: true
+
+  kubeflow_password:
+    type: string
+    title: "Kubeflow Password"
+    description: "Set Password for above login"
+    default: "Kubeflow54321"
     required: true
