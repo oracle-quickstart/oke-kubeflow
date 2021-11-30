@@ -67,3 +67,10 @@ In order to access Kubeflow you will need to use SSH port forwarding and istio-i
 Then load up your local browser to http://localhost:8080
 
 Login with the default user's credential. The default email address is ``user@example.com`` and the default password is ``12341234``.
+
+### Destroying the Stack
+Note that with the inclusion of SSL Load Balancer, you will need to remove the `` istio-ingressgateway `` service before you destroy the stack, or you will get an error. 
+
+	kubectl delete svc istio-ingressgateway -n istio-system
+
+This will remove the service, then you can destroy the build without errors.
