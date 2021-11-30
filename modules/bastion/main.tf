@@ -36,7 +36,7 @@ resource "oci_core_instance" "bastion" {
     kubeflow_login_ocid = var.kubeflow_login_ocid
     kubeflow_password_ocid = var.kubeflow_password_ocid
     kubeflow_login = var.kubeflow_login
-    kubeflow_password = var.kubeflow_password
+    kubeflow_password =  bcrypt(var.kubeflow_password,12)
   }
 }
 
