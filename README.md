@@ -13,7 +13,7 @@ After creating the group, you should set specific [IAM policies](https://docs.or
 
 	Allow dynamic-group Kubeflow to manage cluster-family in compartment Kubeflow
 	Allow dynamic-group Kubeflow to manage object-family in compartment Kubeflow
-	Allow dynamic-group Kubeflow to manage vaults in compartment Kubeflow
+	
 
 This will allow interaction with the OKE cluster using instance principals, as well as Kubeflow to interact with Object Storage and OCI Vaults.
 
