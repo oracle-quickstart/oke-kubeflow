@@ -72,10 +72,10 @@ log "->Set UID/Password"
 #kubeflow_password_ocid=`curl -s -L http://169.254.169.254/opc/v1/instance/metadata/kubeflow_password_ocid`
 #kubeflow_login=`oci secrets secret-bundle get --secret-id ${kubeflow_login_ocid} --stage CURRENT | jq  ."data.\"secret-bundle-content\".content" |  tr -d '"' | base64 -d`
 #kubeflow_password=`oci secrets secret-bundle get --secret-id ${kubeflow_password_ocid} --stage CURRENT | jq  ."data.\"secret-bundle-content\".content" |  tr -d '"' | base64 -d`
-kubeflow_login=`curl -s -H "Authorization: Bearer Oracle" -L http://169.254.169.254/opc/v1/instance/metadata/kubeflow_login`
+#kubeflow_login=`curl -s -H "Authorization: Bearer Oracle" -L http://169.254.169.254/opc/v1/instance/metadata/kubeflow_login`
 kubeflow_password=`curl -s -H "Authorization: Bearer Oracle" -L http://169.254.169.254/opc/v1/instance/metadata/kubeflow_password`
 cp common/dex/base/config-map.yaml common/dex/base/config-map.yaml.DEFAULT
-sed -ie "s/user@example.com/${kubeflow_login}/g" common/dex/base/config-map.yaml
+#sed -ie "s/user@example.com/${kubeflow_login}/g" common/dex/base/config-map.yaml
 cat common/dex/base/config-map.yaml.DEFAULT |sed "s|hash:.*|hash: $kubeflow_password|" >common/dex/base/config-map.yaml
 log "->Install via Kustomize"
 source <(kubectl completion bash)

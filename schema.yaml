@@ -362,6 +362,7 @@ variables:
     description: "Set Login for Kubeflow e.g. your email address"
     default: "user@example.com"
     required: true
+    visible: false
 
   kubeflow_password:
     type: string
