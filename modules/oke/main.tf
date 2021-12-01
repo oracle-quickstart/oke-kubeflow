@@ -43,13 +43,13 @@ resource "oci_containerengine_node_pool" "kubeflow_node_pool" {
     }
     size = var.kubeflow_node_pool_size
   }
-
+  
   dynamic "node_shape_config" {
-    for_each = local.flex_shape
-      content {
-        memory_in_gbs = node_shape_config.value.memory_in_gbs
-        ocpus = node_shape_config.value.ocpus
-      }
+    for_each = var.is_flex_node_shape ? [1] : []
+    content {
+      ocpus         = var.node_pool_node_shape_config_ocpus
+      memory_in_gbs = var.node_pool_node_shape_config_memory_in_gbs
+    }
   }
 
   node_source_details {
@@ -62,3 +62,4 @@ resource "oci_containerengine_node_pool" "kubeflow_node_pool" {
     value = var.kubeflow_node_pool_name
   }
 }
+
