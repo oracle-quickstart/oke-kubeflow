@@ -59,14 +59,15 @@ You can check status of the OKE cluster using the following kubectl commands:
 	kubectl get pods -n kubeflow-user-example-com
 
 ### Kubeflow Access
-In order to access Kubeflow you will need to use SSH port forwarding and istio-ingressgateway:
 
-	ssh -i ~/.ssh/PRIVATE_KEY -L 8080:localhost:8080 opc@EDGE_NODE_IP
-	sudo kubectl port-forward svc/istio-ingressgateway -n istio-system 8080:80
 
-Then load up your local browser to http://localhost:8080
+	ssh -i ~/.ssh/PRIVATE_KEY opc@EDGE_NODE_IP
+	cat /var/log/OKE-kubeflow-initialize.log|egrep -i "Load Balancer IP"
 
-Login with the default user's credential. The default email address is ``user@example.com`` and the default password is ``12341234``.
+Then load up your browser to https://<load balancer ip> 
+	Note: The certificate created above is a self signed certificate and hence the browser will issue warning. It needs to be accepted. 
+
+Login with the default user's credential. The default email address is ``user@example.com`` and the password is what was provided with ORM (default is Kubeflow54321)
 
 ### Destroying the Stack
 Note that with the inclusion of SSL Load Balancer, you will need to remove the `` istio-ingressgateway `` service before you destroy the stack, or you will get an error. 
