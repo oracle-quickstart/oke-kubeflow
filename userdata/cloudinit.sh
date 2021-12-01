@@ -1,17 +1,24 @@
 #!/bin/bash
+#adding comments to make code readable
+
+set -o pipefail
 LOG_FILE="/var/log/OKE-kubeflow-initialize.log"
 log() { 
 	echo "$(date) [${EXECNAME}]: $*" >> "${LOG_FILE}" 
 }
-region=`curl -s -H "Authorization: Bearer Oracle" -L http://169.254.169.254/opc/v1/instance/regionInfo/regionIdentifier`
+
+region=`curl -s -H "Authorization: Bearer Oracle" -L http://169.254.169.254/opc/v2/instance/regionInfo/regionIdentifier`
 namespace=`curl -s -H "Authorization: Bearer Oracle" -L http://169.254.169.254/opc/v2/instance/metadata/namespace`
 oke_cluster_id=`curl -s -H "Authorization: Bearer Oracle" -L http://169.254.169.254/opc/v1/instance/metadata/oke_cluster_id`
+kubeflow_password=`curl -s -H "Authorization: Bearer Oracle" -L http://169.254.169.254/opc/v1/instance/metadata/kubeflow_password`
+
 country=`echo $region|awk -F'-' '{print $1}'`
 city=`echo $region|awk -F'-' '{print $2}'`
 
 EXECNAME="Kubectl & Git"
+
 log "->Install"
-# Get the latest kubectl
+# Get the latest kubectl and not use archaic ones that are in default repo
 cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
 [kubernetes]
 name=Kubernetes
@@ -22,6 +29,8 @@ repo_gpgcheck=1
 gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 EOF
 yum install kubectl git screen -y >> $LOG_FILE
+
+# Kubectl is installed and now, you need to configure kubectl
 log "->Configure"
 mkdir -p /home/opc/.kube
 echo "source <(kubectl completion bash)" >> ~/.bashrc
@@ -29,6 +38,8 @@ echo "alias k='kubectl'" >> ~/.bashrc
 echo "source <(kubectl completion bash)" >> /home/opc/.bashrc
 echo "alias k='kubectl'" >> /home/opc/.bashrc
 source ~/.bashrc
+
+# Get the OCI CLI installed
 EXECNAME="OCI CLI"
 log "->Download"
 curl -L -O https://raw.githubusercontent.com/oracle/oci-cli/master/scripts/install/install.sh >> $LOG_FILE
@@ -41,6 +52,7 @@ echo "export OCI_CLI_AUTH=instance_principal" >> /home/opc/.bash_profile
 echo "export OCI_CLI_AUTH=instance_principal" >> /home/opc/.bashrc
 EXECNAME="Kubeconfig"
 log "->Generate"
+
 RET_CODE=1
 INDEX_NR=1
 SLEEP_TIME="10s"
@@ -53,11 +65,15 @@ do
 	oci ce cluster create-kubeconfig --cluster-id ${oke_cluster_id} --file /root/.kube/config  --region ${region} --token-version 2.0.0 >> $LOG_FILE
 	log "-->Finished attempt"
 done
+
 mkdir -p /home/opc/.kube/
 cp /root/.kube/config /home/opc/.kube/config
 chown -R opc:opc /home/opc/.kube/
 EXECNAME="Kustomize"
 log "->Fetch & deploy to /bin/"
+
+
+# Now that we have kubectl configured, let us download kustomize
 wget https://github.com/kubernetes-sigs/kustomize/releases/download/v3.2.0/kustomize_3.2.0_linux_amd64
 mv kustomize_3.2.0_linux_amd64 /bin/kustomize
 chmod +x /bin/kustomize
@@ -67,23 +83,12 @@ mkdir -p /opt/kubeflow
 cd /opt/kubeflow
 git clone https://github.com/kubeflow/manifests.git >> $LOG_FILE
 cd manifests
-log "->Set UID/Password"
-#kubeflow_login_ocid=`curl -s -L http://169.254.169.254/opc/v1/instance/metadata/kubeflow_login_ocid`
-#kubeflow_password_ocid=`curl -s -L http://169.254.169.254/opc/v1/instance/metadata/kubeflow_password_ocid`
-#kubeflow_login=`oci secrets secret-bundle get --secret-id ${kubeflow_login_ocid} --stage CURRENT | jq  ."data.\"secret-bundle-content\".content" |  tr -d '"' | base64 -d`
-#kubeflow_password=`oci secrets secret-bundle get --secret-id ${kubeflow_password_ocid} --stage CURRENT | jq  ."data.\"secret-bundle-content\".content" |  tr -d '"' | base64 -d`
-#kubeflow_login=`curl -s -H "Authorization: Bearer Oracle" -L http://169.254.169.254/opc/v1/instance/metadata/kubeflow_login`
-kubeflow_password=`curl -s -H "Authorization: Bearer Oracle" -L http://169.254.169.254/opc/v1/instance/metadata/kubeflow_password`
 cp common/dex/base/config-map.yaml common/dex/base/config-map.yaml.DEFAULT
-#sed -ie "s/user@example.com/${kubeflow_login}/g" common/dex/base/config-map.yaml
 cat common/dex/base/config-map.yaml.DEFAULT |sed "s|hash:.*|hash: $kubeflow_password|" >common/dex/base/config-map.yaml
 log "->Install via Kustomize"
 source <(kubectl completion bash)
 log "-->Build & Deploy Kubeflow"
-screen -dmLS Kubeflow
-log "----> Inserting build commands into screen session.  Attach to this as root using 'screen -r' command to see build and deploy log"
-screen -XS Kubeflow stuff "while ! kustomize build example | kubectl apply --kubeconfig /root/.kube/config -f -; do echo 'Retrying to apply resources'; sleep 10; done \\n"
-log "-->Build LB service"
+while ! kustomize build example | kubectl apply --kubeconfig /root/.kube/config -f - | tee -a $LOG_FILE; do echo 'Retrying to apply resources'; sleep 60; done 
 cat <<EOF | sudo tee /tmp/patchservice_lb.yaml
 spec:
   type: LoadBalancer
@@ -94,6 +99,7 @@ metadata:
     service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "800"
     service.beta.kubernetes.io/oci-load-balancer-enable-proxy-protocol: "true"
 EOF
+
 for i in {1..3}; do
   if [ $(kubectl --kubeconfig /root/.kube/config get pods -n istio-system --no-headers=true |egrep -i ingressgateway | awk '{print $3}') = "Running" ]; then
       echo "Ingress Gateway has been created successfully"
@@ -104,9 +110,9 @@ for i in {1..3}; do
 done
 kubectl --kubeconfig /root/.kube/config patch svc istio-ingressgateway -n istio-system -p "$(cat /tmp/patchservice_lb.yaml)" | tee -a $LOG_FILE
 sleep 120
+#LBIP=$(kubectl get svc istio-ingressgateway -n istio-system -o=jsonpath="{.spec.loadBalancerIP}")
 LBIP=$(kubectl --kubeconfig /root/.kube/config get svc istio-ingressgateway -n istio-system -o=jsonpath="{.status.loadBalancer.ingress[0].ip}")
-log "--->Load Balancer IP is ${LBIP}"
-log "-->Build SSL"
+echo "Load Balancer IP is ${LBIP}" |tee -a $LOG_FILE
 mkdir -p kfsecure
 cd kfsecure
 cat <<EOF | sudo tee san.cnf
@@ -140,7 +146,7 @@ items:
   metadata:
     annotations:
     name: kubeflow-gateway
-    namespace: ${namespace}
+    namespace: kubeflow
   spec:
     selector:
       istio: ingressgateway
@@ -167,16 +173,5 @@ metadata:
   resourceVersion: ""
   selfLink: ""
 EOF
+
 kubectl --kubeconfig /root/.kube/config apply -f sslenableingress.yaml
-log "->Done" 
-EXECNAME="INFO"
-log "-> Use following commands to check pod status"
-log "---->
-kubectl get pods -n cert-manager
-kubectl get pods -n istio-system
-kubectl get pods -n auth
-kubectl get pods -n knative-eventing
-kubectl get pods -n knative-serving
-kubectl get pods -n kubeflow
-kubectl get pods -n kubeflow-user-example-com
-<----"
