@@ -35,9 +35,9 @@ module "oke" {
   ssh_public_key = var.ssh_provided_public_key
   cluster_endpoint_config_is_public_ip_enabled = var.cluster_endpoint_config_is_public_ip_enabled
   endpoint_subnet_id = var.cluster_endpoint_config_is_public_ip_enabled ? module.network.edge-id : module.network.private-id
-  node_pool_node_shape_config_memory_in_gbs = var.flex_gbs
-  node_pool_node_shape_config_ocpus = var.flex_ocpu
-  is_flex_shape = contains(["VM.Standard.E3.Flex", "VM.Standard.E4.Flex", "VM.Optimized3.Flex", "VM.Standard.A1.Flex"], var.kubeflow_node_pool_shape)
+  node_pool_node_shape_config_ocpus = var.node_pool_node_shape_config_ocpus
+  node_pool_node_shape_config_memory_in_gbs = var.node_pool_node_shape_config_memory_in_gbs
+  is_flex_node_shape = contains(local.compute_flexible_shapes, var.kubeflow_node_pool_shape)
 }
 
 module "bastion" {
@@ -57,12 +57,15 @@ module "bastion" {
   tenancy_ocid = var.tenancy_ocid
   namespace = var.kubeflow_namespace
   kube_label = var.kube_label
-  bastion_flex_gbs = var.bastion_flex_gbs
-  bastion_flex_ocpus = var.bastion_flex_ocpus
-  is_flex_shape = contains(["VM.Standard.E3.Flex", "VM.Standard.E4.Flex", "VM.Optimized3.Flex", "VM.Standard.A1.Flex"], var.bastion_shape)
-  kubeflow_login_ocid = var.kubeflow_login_ocid
-  kubeflow_password_ocid = var.kubeflow_password_ocid
-  kubeflow_login = var.kubeflow_login
+  customize_kubeflow = var.customize_kubeflow
   kubeflow_password = var.kubeflow_password
+  bastion_shape_config_ocpus = var.bastion_shape_config_ocpus
+  bastion_shape_config_memory_in_gbs = var.bastion_shape_config_memory_in_gbs
+  is_flex_bastion_shape = contains(local.compute_flexible_shapes, var.bastion_shape)
 }
 
+# Checks if is using Flexible Compute Shapes
+locals {
+  is_flex_node_shape = contains(local.compute_flexible_shapes, var.kubeflow_node_pool_shape)
+  is_flex_bastion_shape = contains(local.compute_flexible_shapes, var.bastion_shape)
+}

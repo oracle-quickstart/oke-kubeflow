@@ -117,24 +117,13 @@ variable "endpoint_subnet_id" {
   default = " "
 }
 
-variable "is_dynamic_shape" {
+variable "customize_kubeflow" {
   default = "false"
 }
 
-variable "node_pool_node_shape_config_memory_in_gbs" {
-  default = 2
-}
 
-variable "node_pool_node_shape_config_ocpus" {
-  default = 1
-}
-
-variable "flex_gbs" {
-  default = 2
-}
-
-variable "flex_ocpu" {
-  default = 1
+variable "kubeflow_password" {
+  default = "Kubeflow54321"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -150,33 +139,6 @@ variable "bastion_shape" {
   default = "VM.Standard2.1"
 }
 
-variable "bastion_flex_gbs" {
-  default = 1
-}
-
-variable "bastion_flex_ocpus" {
-  default = 2
-}
-
-# ---------------------------------------------------------------------------------------------------------------------
-# Kubeflow Settings
-# ---------------------------------------------------------------------------------------------------------------------
-
-variable "kubeflow_login_ocid" {
-  default = "ocid1.vaultsecret.oc1.iad.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-}
-
-variable "kubeflow_password_ocid" {
-  default = "ocid1.vaultsecret.oc1.iad.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
-}
-
-variable "kubeflow_login" {
-  default = "user@example.com"
-}
-
-variable "kubeflow_password" {
-  default = "Kubeflow54321"
-}
 # ---------------------------------------------------------------------------------------------------------------------
 # Environmental variables
 # You probably want to define these as environmental variables.
@@ -190,3 +152,38 @@ variable "compartment_ocid" {}
 variable "tenancy_ocid" {}
 variable "region" {}
 
+# Dictionary Locals
+locals {
+  compute_flexible_shapes = [
+    "VM.Standard.E3.Flex",
+    "VM.Standard.E4.Flex",
+    "VM.Optimized3.Flex",
+    "VM.Standard.A1.Flex"
+  ]
+}
+
+variable "node_pool_node_shape_config_ocpus" {
+  default     = "4" # Only used if flex shape is selected
+  description = "You can customize the number of OCPUs to a flexible shape"
+}
+variable "node_pool_node_shape_config_memory_in_gbs" {
+  default     = "64" # Only used if flex shape is selected
+  description = "You can customize the amount of memory allocated to a flexible shape"
+}
+
+variable "bastion_shape_config_ocpus"  {
+  default     = "1" # Only used if flex shape is selected
+  description = "You can customize the number of OCPUs to a flexible shape"
+  
+}
+variable "bastion_shape_config_memory_in_gbs" {
+  default     = "8" # Only used if flex shape is selected
+  description = "You can customize the amount of memory allocated to a flexible shape"
+
+}
+
+variable "is_node_pool_shape" {
+  default     = "1" # Only used if flex shape is selected
+  description = "Default is to use E3 Flex"
+
+}
