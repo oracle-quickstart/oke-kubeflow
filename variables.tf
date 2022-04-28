@@ -11,6 +11,15 @@ variable "availability_domain" {
 variable "ssh_provided_public_key" {
   default = ""
 }
+variable "user_ocid" {
+  default = "dummy"
+}
+variable "private_key_path" {
+  default = "/dummy"
+}
+variable "fingerprint" {
+  default = "dummy"
+}
 
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -38,15 +47,15 @@ variable "custom_cidrs" {
 }
 
 variable "VCN_CIDR" {
-  default = "10.0.0.0/16"
+  default = "10.2.0.0/16"
 }
 
 variable "edge_cidr" {
-  default = "10.0.1.0/24"
+  default = "10.2.1.0/24"
 }
 
 variable "private_cidr" {
-  default =  "10.0.2.0/24"
+  default =  "10.2.2.0/24"
 }
 
 variable "vcn_dns_label" {

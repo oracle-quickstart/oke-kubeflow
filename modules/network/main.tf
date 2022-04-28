@@ -83,6 +83,36 @@ resource "oci_core_security_list" "EdgeSubnet" {
     protocol = "6"
     source   = "0.0.0.0/0"
   }
+
+  ingress_security_rules {
+    tcp_options {
+      max = 80
+      min = 80
+    }
+
+    protocol = "6"
+    source   = "0.0.0.0/0"
+  }
+
+  ingress_security_rules {
+    tcp_options {
+      max = 443
+      min = 443
+    }
+
+    protocol = "6"
+    source   = "0.0.0.0/0"
+  }
+
+  ingress_security_rules {
+    tcp_options {
+      max = 22
+      min = 22
+    }
+
+    protocol = "6"
+    source   = "0.0.0.0/0"
+  }
   
   ingress_security_rules {
     tcp_options {
@@ -105,7 +135,7 @@ resource "oci_core_security_list" "EdgeSubnet" {
   }
 
   ingress_security_rules {
-    protocol = "all"
+    protocol = "6"
     source   = var.VCN_CIDR
   }
 }
@@ -128,6 +158,15 @@ resource "oci_core_security_list" "PrivateSubnet" {
   ingress_security_rules {
     protocol = "all"
     source   = var.VCN_CIDR
+  }
+  ingress_security_rules {
+    description  = "Allow  traffic  from load balancers (public subnet) to worker nodes"
+    protocol = "6"
+    source   = "0.0.0.0/0"
+    tcp_options {
+	min = 30000
+	max = 32767 
+   }
   }
 }
 
