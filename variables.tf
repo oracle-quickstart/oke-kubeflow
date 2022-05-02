@@ -155,12 +155,19 @@ variable "bastion_shape" {
 # Instructions on that are here: https://github.com/oracle/oci-quickstart-prerequisites
 # ---------------------------------------------------------------------------------------------------------------------
 
-variable "compartment_ocid" {}
+variable "compartment_ocid" {
+  default = ""
+}
 
 # Required by the OCI Provider
 
-variable "tenancy_ocid" {}
-variable "region" {}
+variable "tenancy_ocid" {
+  default = ""
+}
+
+variable "region" {
+  default = "us-ashburn-1"
+}
 
 # Dictionary Locals
 locals {
