@@ -32,7 +32,6 @@ jobs:
           tf_actions_version: 1.1.9
           tf_actions_subcommand: 'apply'
           tf_actions_working_dir: ${{ env.PROJECT_WORKING_DIR }}
-          args: '-var="save_to"="export-dist"'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Release
