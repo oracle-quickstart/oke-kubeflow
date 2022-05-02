@@ -22,6 +22,7 @@ module "oke" {
   tenancy_ocid = var.tenancy_ocid
   compartment_ocid = var.compartment_ocid
   cluster_name = var.cluster_name
+  #kubernetes_version = data.oci_containerengine_cluster_option.latestclusterversion.kubernetes_versions[length(data.oci_containerengine_cluster_option.latestclusterversion.kubernetes_versions)-1]
   kubernetes_version = var.kubernetes_version
   kubeflow_node_pool_name = var.kubeflow_node_pool_name
   kubeflow_node_pool_shape = var.kubeflow_node_pool_shape

@@ -57,5 +57,10 @@ locals {
   is_oke_public = var.cluster_endpoint_config_is_public_ip_enabled ? module.network.edge-id : module.network.private-id
 }
 
+data "oci_containerengine_cluster_option" "latestclusterversion" {
+    #Required
+    cluster_option_id = "all"
+}
+
 
 

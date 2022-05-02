@@ -2,7 +2,7 @@
 # AD Settings. By default uses AD1 
 # ---------------------------------------------------------------------------------------------------------------------
 variable "availability_domain" {
-  default = "1"
+  default = "0"
 }
 
 # ---------------------------------------------------------------------------------------------------------------------
@@ -87,7 +87,8 @@ variable "cluster_name" {
 }
 
 variable "kubernetes_version" {
-  default = "v1.20.11"
+  # Kubernetes Version v1.22+ is not yet supported by Kubeflow
+  default = "v1.21.5"
 }
 
 variable "kubeflow_node_pool_name" {

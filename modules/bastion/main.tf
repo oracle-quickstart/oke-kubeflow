@@ -3,7 +3,7 @@ data oci_identity_availability_domains adz {
 }
 
 resource "oci_core_instance" "bastion" {
-  availability_domain = data.oci_identity_availability_domains.adz.availability_domains[1].name
+  availability_domain = data.oci_identity_availability_domains.adz.availability_domains[var.availability_domain].name
   compartment_id      = var.compartment_ocid
   shape               = var.instance_shape
   display_name        = var.instance_name

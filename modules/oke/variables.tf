@@ -4,7 +4,9 @@ variable "vcn_id" {}
 variable "subnet_id" {}
 variable "lb_subnet_id" {}
 variable "cluster_name" {}
-variable "kubernetes_version" {}
+variable "kubernetes_version" {
+
+}
 variable "kubeflow_node_pool_name" {}
 variable "kubeflow_node_pool_shape" {}
 variable "kubeflow_node_pool_size" {}

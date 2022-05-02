@@ -1,5 +1,5 @@
 variable "availability_domain" {
-  default = "1"
+  default = "0"
 }
 variable "compartment_ocid" {}
 variable "subnet_id" {}

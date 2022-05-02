@@ -24,8 +24,8 @@ cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
 name=Kubernetes
 baseurl=https://packages.cloud.google.com/yum/repos/kubernetes-el7-x86_64
 enabled=1
-gpgcheck=1
-repo_gpgcheck=1
+gpgcheck=0
+repo_gpgcheck=0
 gpgkey=https://packages.cloud.google.com/yum/doc/yum-key.gpg https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
 EOF
 yum install kubectl git screen -y >> $LOG_FILE
@@ -94,10 +94,7 @@ spec:
   type: LoadBalancer
 metadata:
   annotations:
-    service.beta.kubernetes.io/oci-load-balancer-shape: "flexible"
-    service.beta.kubernetes.io/oci-load-balancer-shape-flex-min: "10"
-    service.beta.kubernetes.io/oci-load-balancer-shape-flex-max: "800"
-    service.beta.kubernetes.io/oci-load-balancer-enable-proxy-protocol: "true"
+    oci.oraclecloud.com/load-balancer-type: "nlb"
 EOF
 
 for i in {1..3}; do
@@ -175,3 +172,7 @@ metadata:
 EOF
 
 kubectl --kubeconfig /root/.kube/config apply -f sslenableingress.yaml
+
+echo "Load Balancer IP is ${LBIP}" |tee -a $LOG_FILE
+
+echo "Point your browser to https://${LBIP}" |tee -a $LOG_FILE

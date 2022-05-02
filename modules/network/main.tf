@@ -63,6 +63,9 @@ resource "oci_core_route_table" "private" {
     }
 }
 
+# Best practice calls for using Network Security Group as opposed to Security Lists
+# next enhancement will be to eliminate security lists completely
+
 resource "oci_core_security_list" "EdgeSubnet" {
   count = var.useExistingVcn ? 0 : 1
   compartment_id = var.compartment_ocid
