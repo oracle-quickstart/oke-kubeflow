@@ -81,7 +81,9 @@ EXECNAME="Kubeflow"
 log "->Clone Repo"
 mkdir -p /opt/kubeflow
 cd /opt/kubeflow
-git clone https://github.com/kubeflow/manifests.git >> $LOG_FILE
+# Ensure Kubeflow 1.5 alone is used
+export KFBRANCH="v1.5-branch"
+git clone -b $KFBRANCH https://github.com/kubeflow/manifests.git >> $LOG_FILE
 cd manifests
 cp common/dex/base/config-map.yaml common/dex/base/config-map.yaml.DEFAULT
 cat common/dex/base/config-map.yaml.DEFAULT |sed "s|hash:.*|hash: $kubeflow_password|" >common/dex/base/config-map.yaml
